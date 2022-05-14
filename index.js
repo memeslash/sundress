@@ -133,14 +133,14 @@ module.exports = function dressup(d) {
 		debug() {
 			debug = !debug
 			d.command.message(`Debug mode ${debug ? 'en' : 'dis'}abled. Item IDs will ${debug ? 'now' : 'no longer'} be displayed on mouse-over.`);
-			d.log(makeover.weapon);
 		},
 		commands() {
 			d.command.message(`<font color="#e8dd13">Commands: (Prefix with ['c', 'costumes', 'dressup', or 'sundress']</font>`);
 			d.command.message(`<font color="#26adf0">['c', 'costumes', 'dressup', 'sundress']</font> :\n Toggles enabling costume changes. Current status: ${enabled ? 'en' : 'dis'}abled.`);
 			d.command.message(`<font color="#26adf0">pick [slot/all]</font> :\n Allows you to pick a costume for the specified slot. Valid slots: 'head', 'face', 'back', 'weapon', 'body'.`);
 			d.command.message(`<font color="#26adf0">pick all</font> :\n Enables makeover mode to let you choose all costume slots at once.`);
-			d.command.message(`<font color="#26adf0">debug</font> :\n Manually stops current makeover.`)
+			d.command.message(`<font color="#26adf0">repeat [slot]</font> :\n Allows you to make repeated costume selections for the specified slot.`)
+			d.command.message(`<font color="#26adf0">stop</font> :\n Manually stops current makeover.`)
 			d.command.message(`<font color="#26adf0">debug</font> :\n Used for debugging. Currently just displays costume item ids on mouse-over.`);
 			d.command.message(`<font color="#26adf0">r</font> :\n Reloads the module (You shouldn't need to do this).`);
 		},
