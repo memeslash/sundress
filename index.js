@@ -1,13 +1,7 @@
 module.exports = function dressup(d) {
-
-	/*#################
-	#### Variables ####
-	#################*/
-
 	let enabled = false;
 	let debug = false;
 	let tikat_id;
-
 	let pick = {
 		"head": false,
 		"face": false,
@@ -15,6 +9,13 @@ module.exports = function dressup(d) {
 		"weapon": false,
 		"body": false,
 		"all": false
+	};
+	let makeover = {
+		"head": false,
+		"face": false,
+		"back": false,
+		"weapon": false,
+		"body": false,
 	};
 
 	let repeat = {
@@ -25,18 +26,9 @@ module.exports = function dressup(d) {
 		"body": false
 	}
 
-	let makeover = {
-		"head": false,
-		"face": false,
-		"back": false,
-		"weapon": false,
-		"body": false
-	};
-
 
 	let my = d.game.me;
-
-	let temp = {
+	let normal = {
 		"weapon": 0,
 		"face": 0,
 		"body": 0,
@@ -53,11 +45,14 @@ module.exports = function dressup(d) {
 		"styleBody": 0,
 		"styleBodyDye": 0
 	}
-
-	/*################
-	#### Commands ####
-	################*/
-
+	let temp = {
+		"styleHead": 0,
+		"styleFace": 0,
+		"styleBack": 0,
+		"styleWeapon": 0,
+		"styleBody": 0,
+		"styleBodyDye": 0
+	}
 	d.command.add(['c', 'dressup', 'costumes', 'sundress'], {
 		$none() {
 			enabled = !enabled;
@@ -105,33 +100,6 @@ module.exports = function dressup(d) {
 				}
 			}
 		},
-		manual(arg, id) {
-			if (!enabled) { d.command.message(`Currently not allowing costume changes. type ['c', 'costumes', 'dressup', 'sundress] to allow apply costumes.`); }
-			if (enabled) {
-				switch (arg) {
-					case 'head':
-						temp.styleHead = id;
-						temp_change_costume();
-						break;
-					case 'face':
-						temp.styleFace = id;
-						temp_change_costume();
-						break;
-					case 'back':
-						temp.styleBack = id;
-						temp_change_costume();
-						break;
-					case 'weapon':
-						temp.styleWeapon = id;
-						temp_change_costume();
-						break;
-					case 'body':
-						temp.styleBody = id;
-						temp_change_costume()
-				}
-			}
-			d.command.message(`Manual override: ${arg}. ID: ${id}.`)
-		},
 		repeat(arg) {
 			if (!enabled) { d.command.message(`Currently not allowing costume changes. type ['c', 'costumes', 'dressup', 'sundress] to allow apply costumes.`); }
 			switch (arg) {
@@ -172,8 +140,7 @@ module.exports = function dressup(d) {
 			d.command.message(`<font color="#26adf0">['c', 'costumes', 'dressup', 'sundress']</font> :\n Toggles enabling costume changes. Current status: ${enabled ? 'en' : 'dis'}abled.`);
 			d.command.message(`<font color="#26adf0">pick [slot/all]</font> :\n Allows you to pick a costume for the specified slot. Valid slots: 'head', 'face', 'back', 'weapon', 'body'.`);
 			d.command.message(`<font color="#26adf0">pick all</font> :\n Enables makeover mode to let you choose all costume slots at once.`);
-			d.command.message(`<font color="#26adf0">manual [slot] [costume id]</font> :\n Allows you to manually set a costume if you know the ID for one. Common use: to hide face/back accessories (id = 0) or a mismatched costume slot.`);
-			d.command.message(`<font color="#26adf0">repeat [slot]</font> :\n Allows you to make repeated costume selections for the specified slot.`);
+			d.command.message(`<font color="#26adf0">debug</font> :\n Manually stops current makeover.`)
 			d.command.message(`<font color="#26adf0">debug</font> :\n Used for debugging. Currently just displays costume item ids on mouse-over.`);
 			d.command.message(`<font color="#26adf0">r</font> :\n Reloads the module (You shouldn't need to do this).`);
 		},
@@ -185,11 +152,6 @@ module.exports = function dressup(d) {
 			d.command.message(`Stopping complete makeover mode. Enjoy your costumes!`);
 		}
 	});
-
-	/*#################
-	#### Functions ####
-	#################*/
-
 	function temp_change_costume() {
 		if (Object.keys(temp).length == 0) return;
 		d.send('S_UNICAST_TRANSFORM_DATA', 6, {
@@ -198,21 +160,21 @@ module.exports = function dressup(d) {
 			gameId: my.gameId,
 			templateId: my.templateId,
 			huntingZoneId: my.huntingZoneId,
-			appearance: temp.appearance,
+			appearance: normal.appearance,
 			type: 0,
-			weapon: temp.weapon,
-			body: temp.body,
-			hand: temp.hand,
-			feet: temp.feet,
-			face: temp.face,
+			weapon: normal.weapon,
+			body: normal.body,
+			hand: normal.hand,
+			feet: normal.feet,
+			face: normal.face,
 			styleHead: temp.styleHead,
 			styleFace: temp.styleFace,
 			styleBack: temp.styleBack,
 			styleWeapon: temp.styleWeapon,
 			styleBody: temp.styleBody,
 			styleBodyDye: temp.styleBodyDye,
-			details: temp.details,
-			shape: temp.shape,
+			details: normal.details,
+			shape: normal.shape,
 			styleHeadScale: 1,
 			styleHeadRotation: { x: 0, y: 0, z: 0 },
 			styleFaceScale: 1,
@@ -221,70 +183,53 @@ module.exports = function dressup(d) {
 			styleBackRotation: { x: 0, y: 0, z: 0 }
 		});
 	}
-
 	function apply_data(base, replacer) {
 		Object.keys(replacer).forEach(key => {
 			if (base.hasOwnProperty(key)) { base[key] = replacer[key] }
 		});
 	}
-
-	/*#############
-	#### Hooks ####
-	#############*/
-
 	d.hook('S_LOGIN', '*', (e) => {
-		temp.shape = e.shape;
-		temp.details = e.details;
-		temp.appearance = e.appearance;
-		temp.weapon = e.weapon;
-		temp.face = e.face;
-		temp.body = e.body;
-		temp.head = e.head;
-		temp.hand = e.hand;
-		temp.feet = e.feet;
-		temp.styleBody = e.styleBody;
-		temp.styleFace = e.styleFace;
-		temp.styleHead = e.styleHead;
-		temp.styleBack = e.styleBack;
-		temp.styleWeapon = e.styleWeapon;
-		temp.styleBodyDye = e.styleBodyDye;
+		normal.shape = e.shape;
+		normal.details = e.details;
+		normal.appearance = e.appearance;
+		normal.weapon = e.weapon;
+		normal.face = e.face;
+		normal.body = e.body;
+		normal.head = e.head;
+		normal.hand = e.hand;
+		normal.feet = e.feet;
+		normal.styleBody = temp.styleBody = e.styleBody;
+		normal.styleFace = temp.styleFace = e.styleFace;
+		normal.styleHead = temp.styleHead = e.styleHead;
+		normal.styleBack = temp.styleBack = e.styleBack;
+		normal.styleWeapon = temp.styleWeapon = e.styleWeapon;
+		normal.styleBodyDye = temp.styleBodyDye = e.styleBodyDye;
 		return true;
 	});
-
 	d.hook('S_GET_USER_LIST', '*', (e) => {
 		temp = {};
 	});
-
-	d.hook('S_SPAWN_ME', '*', (e) => {
-		d.setTimeout(() => { temp_change_costume(); }, 250);
-	});
-
 	d.hook('S_UNICAST_TRANSFORM_DATA', '*', (e) => {
-		if (!d.game.me.is(e.gameId)) return;
-
+		if (!d.game.me.is(e.gameId) || !enabled) return;
 		apply_data(temp, e);
 		d.setTimeout(() => { temp_change_costume(); }, 250);
 	});
-
 	d.hook('S_USER_EXTERNAL_CHANGE', '*', (e) => {
-		if (!d.game.me.is(e.gameId)) return;
-
+		if (!d.game.me.is(e.gameId || !enabled)) return;
 		d.setTimeout(() => { temp_change_costume(); }, 50);
 	});
-
 	d.hook('S_REQUEST_CONTRACT', '*', (e) => {
 		if (e.type == 63) { tikat_id = e.id; }
 	});
 
 	d.hook('S_CANCEL_CONTRACT', '*', (e) => {
 		if (e.type == 63 && e.id == tikat_id) {
-			pick.face = pick.back = pick.weapon = pick.body = pick.all = repeat.head = repeat.face = repeat.back = repeat.weapon = pick.all = makeover.head = makeover.face = makeover.back = makeover.weapon = makeover.body = false;
-			apply_data(temp, normal)
+			pick.all = makeover.head = makeover.face = makeover.back = makeover.weapon = makeover.body = false;
 			d.command.message(`Tikat shop closed! Restoring costumes back to default.`);
+			apply_data(temp, normal);
 			d.setTimeout(() => { temp_change_costume(); }, 250);
 		}
 	});
-
 	d.hook('S_REPLY_NONDB_ITEM_INFO', '*', (e) => {
 		if (!enabled) return;
 		switch (true) {
