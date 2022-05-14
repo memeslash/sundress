@@ -114,17 +114,17 @@ module.exports = function dressup(d) {
 					d.command.message(`Face accessory costume repeating ${repeat.face ? 'enabled. Type "c repeat face" again to disable repeated selections.' : 'disabled.'}`);
 					break;
 				case 'back':
-					repeat.back = true;
+					repeat.back = !repeat.back;
 					pick.face = pick.back = pick.weapon = pick.body = pick.all = repeat.head = repeat.face = repeat.weapon = repeat.body = false;
 					d.command.message(`Back accessory costume repeating ${repeat.back ? 'enabled. Type "c repeat back" again to disable repeated selections.' : 'disabled.'}`);
 					break;
 				case 'weapon':
-					repeat.weapon = true;
+					repeat.weapon = !repeat.weapon;
 					pick.face = pick.back = pick.weapon = pick.body = pick.all = repeat.head = repeat.face = repeat.back = repeat.body = false;
 					d.command.message(`Weapon skin costume repeating ${repeat.weapon ? 'enabled. Type "c repeat weapon" again to disable repeated selections.' : 'disabled.'}`);
 					break;
 				case 'body':
-					repeat.body = true;
+					repeat.body = !repeat.weapon;
 					pick.face = pick.back = pick.weapon = pick.body = pick.all = repeat.head = repeat.face = repeat.back = repeat.weapon = false;
 					d.command.message(`Body costume repeating ${repeat.body ? 'enabled. Type "c repeat body" again to disable repeated selections.' : 'disabled.'}`);
 					break;
